@@ -1,6 +1,7 @@
 from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import UniqueConstraint
 from users.models import User
 
 MAX_LEN_SHORT = 7
@@ -123,13 +124,47 @@ class IngredientRecipe(models.Model):
         ]
 
 
-class Favorite(models.Model):
+class FavoriteAndShopModel(models.Model):
     user = models.ForeignKey(
         User,
-        verbose_name='Recipe user',
-        related_name='favorite',
         on_delete=models.CASCADE,
     )
-    recipe = models.ManyToManyField(
+    recipe = models.ForeignKey(
         Recipe,
+        on_delete=models.CASCADE,
     )
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f'{self.user} - {self.recipe}'
+
+
+class Favorite(FavoriteAndShopModel):
+    class Meta(FavoriteAndShopModel.Meta):
+        verbose_name = 'Favorite Recipe'
+        verbose_name_plural = 'Favorite Recipes'
+        default_related_name = 'favorites'
+        constraints = [
+            UniqueConstraint(
+                fields=('user', 'recipe'),
+                name='unique_favorite'
+            )
+        ]
+
+
+class ShoppingCart(FavoriteAndShopModel):
+    class Meta:
+        verbose_name = 'Shopping cart'
+        verbose_name_plural = 'Shopping carts'
+        default_related_name = 'shopping_cart'
+        constraints = (
+            UniqueConstraint(
+                fields=('recipe', 'user',),
+                name='unique_shopping_cart',
+            ),
+        )
+
+    def __str__(self):
+        return f'{self.user.username} - {self.recipe.name}'

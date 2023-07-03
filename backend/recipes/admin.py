@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import Recipe, IngredientRecipe, Ingredient, Tag
+from .models import (Recipe,
+                     IngredientRecipe,
+                     Ingredient,
+                     Tag,
+                     ShoppingCart
+                     )
 
 
 class IngredientInline(admin.StackedInline):
@@ -41,3 +46,12 @@ class TagAdmin(admin.ModelAdmin):
     list_editable = ('slug',)
     list_filter = ('name', 'slug',)
     search_fields = ('name', 'slug')
+
+@admin.register(ShoppingCart)
+class ShoppingCart(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'recipe',
+    )
+    list_filter = ('recipe',)
+    search_fields = ('recipe',)

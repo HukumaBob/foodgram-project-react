@@ -22,7 +22,13 @@ class User(AbstractUser):
         (ROLE_AUTHOR, 'Authorized user'),
         (ROLE_ADMIN, 'Administrator'),
     )
-
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username', 'first_name', 'last_name',)
+    email = models.EmailField(
+        max_length=254,
+        verbose_name='email',
+        unique=True
+    )
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
@@ -43,10 +49,11 @@ class User(AbstractUser):
         return self.role == self.ROLE_ADMIN
 
     class Meta:
-        ordering = ('username', )
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
+
 
 class Subscribe(models.Model):
     user = models.ForeignKey(
