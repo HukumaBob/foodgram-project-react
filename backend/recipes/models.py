@@ -127,10 +127,12 @@ class IngredientRecipe(models.Model):
 class FavoriteAndShopModel(models.Model):
     user = models.ForeignKey(
         User,
+        verbose_name='User',
         on_delete=models.CASCADE,
     )
     recipe = models.ForeignKey(
         Recipe,
+        verbose_name='Recipe',
         on_delete=models.CASCADE,
     )
 
@@ -145,7 +147,7 @@ class Favorite(FavoriteAndShopModel):
     class Meta(FavoriteAndShopModel.Meta):
         verbose_name = 'Favorite Recipe'
         verbose_name_plural = 'Favorite Recipes'
-        default_related_name = 'favorites'
+        default_related_name = 'favorite'
         constraints = [
             UniqueConstraint(
                 fields=('user', 'recipe'),
@@ -155,7 +157,7 @@ class Favorite(FavoriteAndShopModel):
 
 
 class ShoppingCart(FavoriteAndShopModel):
-    class Meta:
+    class Meta(FavoriteAndShopModel.Meta):
         verbose_name = 'Shopping cart'
         verbose_name_plural = 'Shopping carts'
         default_related_name = 'shopping_cart'
@@ -166,5 +168,3 @@ class ShoppingCart(FavoriteAndShopModel):
             ),
         )
 
-    def __str__(self):
-        return f'{self.user.username} - {self.recipe.name}'

@@ -14,14 +14,6 @@ class User(AbstractUser):
     Provides properties to check user roles: is_guest, is_author, is_admin.
     """
 
-    ROLE_GUEST = 'user'
-    ROLE_AUTHOR = 'author'
-    ROLE_ADMIN = 'admin'
-    ROLE_CHOICES = (
-        (ROLE_GUEST, 'Guest'),
-        (ROLE_AUTHOR, 'Authorized user'),
-        (ROLE_ADMIN, 'Administrator'),
-    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name',)
     email = models.EmailField(
@@ -29,24 +21,7 @@ class User(AbstractUser):
         verbose_name='email',
         unique=True
     )
-    role = models.CharField(
-        max_length=20,
-        choices=ROLE_CHOICES,
-        default=ROLE_GUEST,
-        verbose_name='Role',
-    )
 
-    @property
-    def is_guest(self):
-        return self.role == self.ROLE_GUEST
-
-    @property
-    def is_author(self):
-        return self.role == self.ROLE_AUTHOR
-
-    @property
-    def is_admin(self):
-        return self.role == self.ROLE_ADMIN
 
     class Meta:
         ordering = ('username',)
