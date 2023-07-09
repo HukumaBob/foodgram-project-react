@@ -18,7 +18,8 @@ class Command(BaseCommand):
         # Iterate over the models and their respective CSV files
         for model, csv in TABLES.items():
             # Open the CSV file
-            with open(f"../data/{csv}", encoding="utf-8") as file:
+            #with open(f"./data/{csv}", encoding="utf-8") as file:
+            with open(f"{csv}", encoding="utf-8") as file:
                 # Create a dictionary reader for the CSV file
                 reader = DictReader(file)
                 # Iterate over each row in the CSV file
