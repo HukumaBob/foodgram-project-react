@@ -6,14 +6,6 @@ from .validators import validate_username, validate_year
 
 
 class User(AbstractUser):
-    """
-    Custom user model extending Django's AbstractUser.
-    Represents a user of the application.
-    Inherits fields like username, first_name, last_name, email, password from AbstractUser.
-    Adds additional field: role.
-    Provides properties to check user roles: is_guest, is_author, is_admin.
-    """
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username', 'first_name', 'last_name',)
     email = models.EmailField(
