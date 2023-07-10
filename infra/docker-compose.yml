@@ -9,7 +9,7 @@ services:
       - pg_data:/var/lib/postgresql/data/
 
   backend:
-     image: hukumabob/foodgram_backend:latest
+    image: hukumabob/foodgram_backend:latest
     restart: always
     volumes:
         - static_value:/app/static/
@@ -38,7 +38,6 @@ services:
       - media_value:/var/html/media/
 
     depends_on:
-      - frontend
       - backend
 
 volumes:

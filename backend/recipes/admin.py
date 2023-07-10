@@ -1,12 +1,9 @@
 from django.contrib import admin
 
-from .models import (Recipe,
-                     IngredientRecipe,
-                     Ingredient,
-                     Tag,
-                     Favorite,
-                     ShoppingCart
-                     )
+from .models import (
+    Recipe, IngredientRecipe, Ingredient,
+    Tag, Favorite, ShoppingCart
+)
 
 
 class IngredientInline(admin.StackedInline):
@@ -48,6 +45,7 @@ class TagAdmin(admin.ModelAdmin):
     list_filter = ('name', 'slug',)
     search_fields = ('name', 'slug')
 
+
 @admin.register(Favorite)
 class Favorite(admin.ModelAdmin):
     list_display = (
@@ -56,6 +54,8 @@ class Favorite(admin.ModelAdmin):
     )
     list_filter = ('recipe',)
     search_fields = ('recipe',)
+
+
 @admin.register(ShoppingCart)
 class ShoppingCart(admin.ModelAdmin):
     list_display = (

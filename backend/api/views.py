@@ -5,8 +5,7 @@ from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly)
 from recipes.models import (
     Favorite,
     Ingredient,
@@ -30,13 +29,14 @@ from .serializer import (
     UserSerializer,
 )
 
-
+# CustomUserViewSet handles user-related operations
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
     pagination_class = CustomPagination
 
+    # Action to get user subscriptions
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
         user = request.user
@@ -49,6 +49,7 @@ class CustomUserViewSet(UserViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
+    # Action to handle user subscription to another user
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
@@ -82,6 +83,7 @@ class CustomUserViewSet(UserViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# TagViewSet handles tag-related operations
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -89,16 +91,17 @@ class TagViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
 
+# IngredientViewSet handles ingredient-related operations
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     pagination_class = None
-    # filter_backends = (filters.SearchFilter, )
     filter_class = (IngredientFilter,)
     search_fields = ('^name',)
 
 
+# RecipeViewSet handles recipe-related operations
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeCreateSerializer
@@ -107,11 +110,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
+    # Determine the serializer class based on the request method
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return RecipesSerializer
         return RecipeCreateSerializer
 
+    # Save the shopping list to a file
     @staticmethod
     def save_shopping_list(ingredients):
         with open('shopping_list.txt', 'w') as file:
@@ -127,6 +132,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
+    # Action to download the shopping cart as a file
     @action(detail=False, methods=['GET'])
     def download_shopping_cart(self, request):
         ingredients = IngredientRecipe.objects.filter(
@@ -136,6 +142,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).annotate(amount=Sum('amount'))
         return self.save_shopping_list(ingredients)
 
+    # Action to add or remove a recipe from the shopping cart
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
@@ -167,6 +174,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    # Action to add or remove a recipe from favorites
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
@@ -199,6 +207,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# FavoriteViewSet handles favorite-related operations
 class FavoriteViewSet(viewsets.ModelViewSet):
     queryset = Favorite.objects.all()
     serializer_class = FavoriteSerializer
@@ -206,6 +215,7 @@ class FavoriteViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
 
+# ShoppingCartViewSet handles shopping cart-related operations
 class ShoppingCartViewSet(viewsets.ModelViewSet):
     queryset = ShoppingCart.objects.all()
     serializer_class = ShoppingCartSerializer
