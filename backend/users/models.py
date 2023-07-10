@@ -11,7 +11,6 @@ class User(AbstractUser):
         unique=True
     )
 
-
     class Meta:
         ordering = ('username',)
 
