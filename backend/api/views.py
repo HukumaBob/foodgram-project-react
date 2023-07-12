@@ -136,11 +136,17 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(total=Sum('amount'))
         shopping_list = self.generate_shopping_list(ingredients)
-        response = HttpResponse(shopping_list, content_type="text/plain; charset=utf-8")
-        response['Content-Disposition'] = 'attachment; filename="shopping_list.txt"'
+        response = HttpResponse(
+            shopping_list, content_type="text/plain; charset=utf-8"
+        )
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping_list.txt"'
+        )
         return response
 
-    def handle_favorite_or_shoping_cart(self, request, pk, serializer_class, model_class):
+    def handle_favorite_or_shoping_cart(
+        self, request, pk, serializer_class, model_class
+    ):
         data = {
             'user': request.user.id,
             'recipe': pk
@@ -171,14 +177,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
         methods=('POST', 'DELETE'),
         permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk):
-        return self.handle_favorite_or_shoping_cart(request, pk, ShoppingCartSerializer, ShoppingCart)
+        return self.handle_favorite_or_shoping_cart(
+            request, pk, ShoppingCartSerializer, ShoppingCart
+        )
 
     @action(
         detail=True,
         methods=('POST', 'DELETE'),
         permission_classes=[IsAuthenticated])
     def favorite(self, request, pk):
-        return self.handle_favorite_or_shoping_cart(request, pk, FavoriteSerializer, Favorite)
+        return self.handle_favorite_or_shoping_cart(
+            request, pk, FavoriteSerializer, Favorite
+        )
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):
