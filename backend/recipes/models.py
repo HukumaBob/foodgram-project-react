@@ -2,6 +2,7 @@ from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
+
 from users.models import User
 
 MAX_LEN_SHORT = 7
@@ -55,7 +56,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         verbose_name='Recipe author',
-        related_name='recipe',
+        related_name='recipes',
         on_delete=models.CASCADE,
     )
     name = models.CharField(
@@ -72,7 +73,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe',
-        related_name='ingredients',
+        related_name='recipes',
     )
     tags = models.ManyToManyField(
         Tag,
@@ -114,9 +115,6 @@ class IngredientRecipe(models.Model):
         ],
     )
 
-    def __str__(self):
-        return f'{self.ingredient} {self.amount}'
-
     class Meta:
         verbose_name = 'Ingredient in the recipe'
         verbose_name_plural = 'Recipe Ingredients'
@@ -126,6 +124,9 @@ class IngredientRecipe(models.Model):
                 name='unique_ingredient_recipe',
             )
         ]
+
+    def __str__(self):
+        return f'{self.ingredient} {self.amount}'
 
 
 # Abstract model for Favorite and ShoppingCart models
