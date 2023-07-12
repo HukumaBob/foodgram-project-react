@@ -5,6 +5,7 @@ from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
+
 from recipes.models import (
     Favorite, Ingredient, IngredientRecipe,
     Recipe, ShoppingCart, Tag
@@ -78,7 +79,7 @@ class SubscribeSerializer(UserSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        recipes = obj.recipe.all()
+        recipes = obj.recipes.all()
         if limit:
             recipes = recipes[: int(limit)]
         serializer = RecipeShortListSerializer(
@@ -88,7 +89,7 @@ class SubscribeSerializer(UserSerializer):
 
     @staticmethod
     def get_recipes_count(obj):
-        return obj.recipe.count()
+        return obj.recipes.count()
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -98,7 +99,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
-    """ Сериализатор связи ингридиентов и рецепта """
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all()
     )
@@ -134,10 +134,6 @@ class RecipesSerializer(serializers.ModelSerializer):
                   'is_favorited', 'is_in_shopping_cart',
                   'name', 'image', 'text', 'cooking_time'
                   )
-
-    def get_ingredients(self, obj):
-        ingredients = IngredientRecipe.objects.filter(recipe=obj)
-        return IngredientRecipeSerializer(ingredients, many=True).data
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
@@ -184,53 +180,46 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
-        list = []
-        for i in ingredients:
-            amount = i['amount']
+        ingredients = data.get('ingredients')
+        ingredient_list = []
+        for ingredient_data in ingredients:
+            amount = ingredient_data['amount']
             if int(amount) < 1:
                 raise serializers.ValidationError({
                     'amount': 'Ingredient quantity must be greater than 0'
                 })
-            if i['id'] in list:
+            if ingredient_data['id'] in ingredient_list:
                 raise serializers.ValidationError({
                     'ingredient': 'Ingredients must be unique'
                 })
-            list.append(i['id'])
+            ingredient_list.append(ingredient_data['id'])
         return data
 
     @staticmethod
     def create_ingredients(recipe, ingredients):
-        ingredient_list = []
-        for ingredient_data in ingredients:
-            ingredient_id = ingredient_data.pop('id')
-            amount = ingredient_data.pop('amount')
-            ingredient = Ingredient.objects.get(id=ingredient_id)
-            ingredient_list.append(
-                IngredientRecipe(
-                    ingredient=ingredient,
-                    amount=amount,
-                    recipe=recipe,
-                )
-            )
-        IngredientRecipe.objects.bulk_create(ingredient_list)
+        IngredientRecipe.objects.bulk_create([
+            IngredientRecipe(ingredient_id=ingredient_data.pop('id'),
+                             amount=ingredient_data.pop('amount'),
+                             recipe=recipe,
+                             )
+            for ingredient_data in ingredients
+])
 
     def create(self, validated_data):
-        try:
-            request = self.context.get('request', None)
-            tags = validated_data.pop('tags')
-            ingredients = validated_data.pop('ingredients')
-            recipe = Recipe.objects.create(
-                author=request.user, **validated_data
-            )
-            recipe.tags.set(tags)
-            self.create_ingredients(recipe, ingredients)
-            return recipe
-        except IntegrityError:
-            error_message = (
-                'The name of the recipe already exists'
-            )
-            raise serializers.ValidationError({'error': error_message})
+        request = self.context.get('request', None)
+        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop('ingredients')
+        name = validated_data.get('name')
+        if Recipe.objects.filter(name=name).exists():
+            raise serializers.ValidationError({
+                'name': 'The name of the recipe already exists'
+            })
+        recipe = Recipe.objects.create(
+            author=request.user, **validated_data
+        )
+        recipe.tags.set(tags)
+        self.create_ingredients(recipe, ingredients)
+        return recipe
 
     def update(self, instance, validated_data):
         instance.tags.clear()
