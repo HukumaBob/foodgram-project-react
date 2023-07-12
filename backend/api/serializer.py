@@ -1,4 +1,3 @@
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserSerializer
 from drf_extra_fields.fields import Base64ImageField
@@ -203,7 +202,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                              recipe=recipe,
                              )
             for ingredient_data in ingredients
-])
+        ])
 
     def create(self, validated_data):
         request = self.context.get('request', None)
