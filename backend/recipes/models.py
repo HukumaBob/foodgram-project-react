@@ -9,7 +9,6 @@ MAX_LEN_SHORT = 7
 MAX_LEN_MED = 50
 
 
-# Ingredient model
 class Ingredient(models.Model):
     name = models.CharField(
         max_length=MAX_LEN_MED,
@@ -29,7 +28,6 @@ class Ingredient(models.Model):
         return f'{self.name} {self.measurement_unit}'
 
 
-# Tag model
 class Tag(models.Model):
     name = models.CharField(
         max_length=MAX_LEN_MED,
@@ -51,7 +49,6 @@ class Tag(models.Model):
         return f'{self.slug}'
 
 
-# Recipe model
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
@@ -90,7 +87,6 @@ class Recipe(models.Model):
         return f'{self.name}'
 
 
-# IngredientRecipe model
 class IngredientRecipe(models.Model):
     recipe = models.ForeignKey(
         Recipe,
@@ -129,7 +125,6 @@ class IngredientRecipe(models.Model):
         return f'{self.ingredient} {self.amount}'
 
 
-# Abstract model for Favorite and ShoppingCart models
 class FavoriteAndShopModel(models.Model):
     user = models.ForeignKey(
         User,
@@ -149,7 +144,6 @@ class FavoriteAndShopModel(models.Model):
         return f'{self.user} - {self.recipe}'
 
 
-# Favorite model
 class Favorite(FavoriteAndShopModel):
     class Meta(FavoriteAndShopModel.Meta):
         verbose_name = 'Favorite Recipe'
@@ -163,7 +157,6 @@ class Favorite(FavoriteAndShopModel):
         ]
 
 
-# ShoppingCart model
 class ShoppingCart(FavoriteAndShopModel):
     class Meta(FavoriteAndShopModel.Meta):
         verbose_name = 'Shopping cart'

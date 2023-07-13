@@ -19,7 +19,6 @@ from recipes.models import (
     Tag,
 )
 from users.models import Subscribe, User
-
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPagination
 from .permissions import IsAuthor
@@ -115,7 +114,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipesSerializer
         return RecipeCreateSerializer
 
-    # Save the shopping list to a file
     @staticmethod
     def generate_shopping_list(ingredients):
         shopping_list = []

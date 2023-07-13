@@ -13,7 +13,6 @@ from users.models import User
 
 
 class UserSerializer(UserSerializer):
-    # Serializer for User model
 
     is_subscribed = SerializerMethodField(read_only=True)
 
