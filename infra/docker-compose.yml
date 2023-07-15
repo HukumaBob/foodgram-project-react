@@ -27,7 +27,8 @@ services:
       - backend
 
   nginx:
-    build: ./nginx/
+    image: hukumabob/foodgram_nginx:latest
+    restart: always
     ports:
       - 80:80
     volumes:

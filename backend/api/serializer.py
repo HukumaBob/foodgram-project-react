@@ -97,17 +97,19 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientRecipeSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all()
+    id = serializers.ReadOnlyField(
+        source='ingredient.id',
     )
-    name = serializers.ReadOnlyField(source='ingredient.name')
+    name = serializers.ReadOnlyField(
+        source='ingredient.name',
+    )
     measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit'
+        source='ingredient.measurement_unit',
     )
 
     class Meta:
         model = IngredientRecipe
-        fields = ('id', 'name', 'measurement_unit', 'amount',)
+        fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -146,18 +148,18 @@ class RecipesSerializer(serializers.ModelSerializer):
         return obj.shopping_cart.filter(user=request.user).exists()
 
 
-class IngredientRecipeSerializer(serializers.ModelSerializer):
+class IngredientsEditSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     amount = serializers.IntegerField()
 
     class Meta:
         model = IngredientRecipe
-        fields = ['id', 'amount']
+        fields = ('id', 'amount')
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    ingredients = IngredientRecipeSerializer(many=True)
+    ingredients = IngredientsEditSerializer(many=True,)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         many=True,
