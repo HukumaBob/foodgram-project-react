@@ -5,8 +5,8 @@ from django.db.models import UniqueConstraint
 
 from users.models import User
 
-MAX_LEN_SHORT = 7
-MAX_LEN_MED = 50
+MAX_LEN_SHORT = 15
+MAX_LEN_MED = 100
 
 
 class Ingredient(models.Model):
