@@ -1,6 +1,11 @@
 ### Description
 The application where users can publish recipes, add other users' recipes to favorites, and subscribe to publications from other authors. The 'Shopping List' feature allows users to create a list of ingredients needed to prepare selected dishes. There is an option to export a text file with a list of required ingredients for the recipes.
 
+## Technologies:
+- Django
+- Python
+- Docker
+
 ## Project Link:
 
 ```
