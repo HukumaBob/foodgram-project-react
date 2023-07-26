@@ -6,20 +6,6 @@ The application where users can publish recipes, add other users' recipes to fav
 - Python
 - Docker
 
-## Project Link:
-
-```
-domain: https://foodgram1967.ddns.net/
-```
-
-## Administrator Account:
-
-```
-username: Nikita
-email: 123@gmail.com
-pass: NRjeSf
-```
-
 ## Installation
 - Clone the repository:
 ```
